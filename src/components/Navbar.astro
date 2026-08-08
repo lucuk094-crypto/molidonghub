@@ -1,0 +1,243 @@
+---
+import animeConfig from "@configs/animeConfig";
+import SearchIcon from "./icons/SearchIcon.astro";
+import MoonIcon from "./icons/MoonIcon.astro";
+import SunIcon from "./icons/SunIcon.astro";
+
+interface Props {
+  navLinks: {
+    title: string;
+    href: string;
+  }[];
+}
+
+const {
+  molidonghub: { siteName, logo },
+} = animeConfig;
+const { navLinks } = Astro.props;
+---
+
+<nav
+  id="navbar"
+  class="fixed w-full z-50 top-0 start-0 
+  backdrop-blur-xl bg-white/80 dark:bg-zinc-950/80
+  border-b border-zinc-200/20 dark:border-zinc-800/20
+  transition-all duration-300
+  shadow-sm dark:shadow-zinc-900/10"
+>
+  <div class="container flex flex-wrap items-center justify-between py-4">
+    <a
+      href={Astro.url.origin}
+      class="flex items-center space-x-3 rtl:space-x-reverse group"
+    >
+      <img src={logo} class="w-8 h-8 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" alt=`${siteName} Logo` />
+      <h1
+        class="self-center text-xl font-bold whitespace-nowrap 
+        bg-gradient-to-br from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 
+        bg-clip-text text-transparent"
+      >
+        {siteName}
+      </h1>
+    </a>
+    <div class="flex md:order-2 space-x-2 md:space-x-2 rtl:space-x-reverse">
+      <button
+        id="navbar-button-search-main"
+        data-dropdown-toggle="dropdownSearch"
+        data-dropdown-placement="bottom-end"
+        type="button"
+        class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm 
+        text-zinc-700 dark:text-zinc-300 rounded-lg 
+        hover:bg-zinc-100 dark:hover:bg-zinc-800
+        transition-all duration-200"
+      >
+        <SearchIcon />
+      </button>
+      <div id="dropdownSearch" class="z-10 hidden w-full">
+        <ul
+          class="p-4 glass-effect text-sm border-b border-zinc-200 dark:border-zinc-600 -translate-y-2 rounded-b-xl"
+        >
+          <form
+            id="navbar-form-search"
+            class="max-w-md mx-auto text-zinc-700 dark:text-zinc-200"
+          >
+            <div class="flex">
+              <div class="relative w-full">
+                <input
+                  type="search"
+                  id="navbar-input-search"
+                  class="block p-3 w-full z-20 text-sm 
+                  text-zinc-900 dark:text-white 
+                  bg-zinc-50 dark:bg-zinc-900 
+                  rounded-lg border border-zinc-300 dark:border-zinc-700 
+                  focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400 
+                  focus:border-zinc-500 dark:focus:border-zinc-400
+                  transition-all duration-200"
+                  placeholder="Cari anime.."
+                  required
+                />
+                <button
+                  type="submit"
+                  class="absolute top-0 end-0 h-full px-4 text-sm font-medium 
+                  text-white dark:text-black 
+                  bg-black dark:bg-white 
+                  rounded-e-lg 
+                  hover:bg-zinc-800 dark:hover:bg-zinc-200 
+                  focus:ring-2 focus:outline-none focus:ring-zinc-500
+                  transition-all duration-200"
+                >
+                  <SearchIcon class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </form>
+        </ul>
+      </div>
+      <button
+        id="button-theme"
+        type="button"
+        class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm 
+        text-zinc-700 dark:text-zinc-300 rounded-lg 
+        hover:bg-zinc-100 dark:hover:bg-zinc-800
+        transition-all duration-200"
+      >
+        <MoonIcon id="icon-moon" class="hidden transition-transform duration-300 hover:rotate-12" />
+        <SunIcon id="icon-sun" class="text-zinc-900 dark:text-yellow-400 hidden transition-transform duration-300 hover:rotate-180" />
+      </button>
+      <button
+        data-collapse-toggle="navbar-sticky"
+        type="button"
+        class="inline-flex items-center p-2 w-10 h-10 justify-center text-sm 
+        text-zinc-700 dark:text-zinc-300 rounded-lg md:hidden 
+        hover:bg-zinc-100 dark:hover:bg-zinc-800
+        transition-all duration-200"
+        aria-controls="navbar-sticky"
+        aria-expanded="false"
+      >
+        <span class="sr-only">Open main menu</span>
+        <svg
+          class="w-5 h-5"
+          aria-hidden="true"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 17 14"
+        >
+          <path
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M1 1h15M1 7h15M1 13h15"></path>
+        </svg>
+      </button>
+    </div>
+    <div
+      class="items-center justify-between hidden w-full md:flex md:w-auto md:order-1"
+      id="navbar-sticky"
+    >
+      <ul
+        class="flex flex-col md:flex-row gap-1 md:gap-2 
+        p-4 md:p-0 mt-4 md:mt-0
+        rounded-xl md:rounded-none
+        bg-zinc-100/50 dark:bg-zinc-900/50 md:bg-transparent
+        border border-zinc-200/50 dark:border-zinc-800/50 md:border-0
+        backdrop-blur-lg md:backdrop-blur-0"
+      >
+        {
+          navLinks.map((link) => {
+            if (link.href === Astro.url.pathname) {
+              return (
+                <li>
+                  <a href={link.href} class="navbar-link-item active">
+                    {link.title}
+                  </a>
+                </li>
+              );
+            }
+
+            return (
+              <li>
+                <a href={link.href} class="navbar-link-item">
+                  {link.title}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<script>
+  // LOGIKA TEMA
+  const themeButtonEl = document.getElementById("button-theme");
+
+  if (themeButtonEl) {
+    themeButtonEl.addEventListener("click", function () {
+      const moonIconEl = this.firstElementChild;
+      const sunIconEl = this.lastElementChild;
+
+      if (moonIconEl && sunIconEl) {
+        const htmlEl = document.documentElement;
+        const theme = localStorage.getItem("theme");
+
+        let newTheme = "";
+
+        if (theme === "light") {
+          sunIconEl.classList.add("hidden");
+          moonIconEl.classList.remove("hidden");
+          newTheme = "dark";
+        } else if (theme === "dark") {
+          moonIconEl.classList.add("hidden");
+          sunIconEl.classList.remove("hidden");
+          newTheme = "light";
+        }
+
+        htmlEl.dataset.theme = newTheme;
+        htmlEl.style.colorScheme = newTheme;
+        localStorage.setItem("theme", newTheme);
+      }
+    });
+  }
+
+  // LOGIKA PENCARIAN
+  const searchFormEl = document.getElementById(
+    "navbar-form-search"
+  ) as HTMLFormElement;
+  const mainSearchButtonEl = document.getElementById(
+    "navbar-button-search-main"
+  );
+  let timeouts: any[] = [];
+
+  if (mainSearchButtonEl) {
+    mainSearchButtonEl.addEventListener(
+      "click",
+      function () {
+        timeouts.forEach((timeout) => {
+          clearTimeout(timeout);
+        });
+
+        timeouts = [];
+
+        timeouts.push(
+          setTimeout(() => {
+            const searchInputEl = document.querySelector("input");
+
+            searchInputEl?.focus();
+          }, 100)
+        );
+      },
+      true
+    );
+  }
+
+  if (searchFormEl) {
+    searchFormEl.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const inputEl = this.querySelector("input");
+
+      location.href = `/search?q=${inputEl?.value}`;
+    });
+  }
+</script>

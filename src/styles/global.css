@@ -1,0 +1,425 @@
+@tailwind base;
+
+@layer base {
+  /* Smooth Scroll */
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px;
+  }
+  
+  /* Vercel-style smooth scrolling */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Modern Loader - Vercel Style */
+  .loader {
+    width: 48px;
+    height: 48px;
+    display: inline-block;
+    position: relative;
+    border: 3px solid transparent;
+    border-top-color: #000;
+    border-radius: 50%;
+    box-sizing: border-box;
+    animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  
+  .dark .loader {
+    border-top-color: #fff;
+  }
+
+  .loader:before {
+    content: "";
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    right: 5px;
+    bottom: 5px;
+    border: 3px solid transparent;
+    border-top-color: #666;
+    border-radius: 50%;
+    animation: spin 1.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  
+  .dark .loader:before {
+    border-top-color: #888;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Smooth transitions */
+  body {
+    @apply transition-colors duration-300;
+  }
+}
+
+@tailwind components;
+
+@layer components {
+  /* Minimalist Liquid Glass Navigation */
+  .navbar-link-item {
+    @apply min-w-max px-4 py-2 text-sm font-medium 
+    text-zinc-600 dark:text-zinc-400
+    rounded-full
+    transition-all duration-300 ease-out
+    relative overflow-hidden;
+  }
+  
+  /* Liquid glass effect on hover */
+  .navbar-link-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.1) 0%, 
+      rgba(255, 255, 255, 0.05) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 9999px;
+  }
+  
+  .dark .navbar-link-item::before {
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.08) 0%, 
+      rgba(255, 255, 255, 0.02) 100%
+    );
+  }
+  
+  .navbar-link-item:hover {
+    @apply text-black dark:text-white;
+    backdrop-filter: blur(8px);
+  }
+  
+  .navbar-link-item:hover::before {
+    opacity: 1;
+  }
+
+  /* Active state - minimal indicator */
+  .navbar-link-item.active {
+    @apply text-black dark:text-white font-semibold
+    bg-zinc-100/50 dark:bg-white/5;
+    backdrop-filter: blur(12px);
+  }
+  
+  .navbar-link-item.active::after {
+    content: "";
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    border-radius: 50%;
+    opacity: 0.6;
+  }
+
+  /* Vercel-style Card - Anime Card with Hover Effect */
+  .anime-card {
+    @apply relative rounded-xl overflow-hidden bg-white dark:bg-zinc-900 
+    border border-zinc-200/50 dark:border-zinc-800/50
+    transition-all duration-300 ease-out
+    hover:shadow-xl hover:shadow-zinc-200/50 dark:hover:shadow-zinc-900/50
+    hover:scale-[1.02] hover:-translate-y-1
+    cursor-pointer;
+  }
+
+  /* Modern Carousel */
+  .carousel-item {
+    @apply duration-700 ease-out;
+  }
+
+  .carousel-item-image {
+    @apply absolute block rounded-2xl md:right-0 w-full lg:w-1/2 h-full object-cover;
+    transition: transform 0.7s ease-out;
+  }
+  
+  .anime-card:hover .carousel-item-image {
+    transform: scale(1.05);
+  }
+  
+  .carousel-item-image[src="/images/logo.png"] {
+    @apply object-contain bg-zinc-100 dark:bg-zinc-900 p-8;
+  }
+
+  .carousel-item-layer {
+    @apply bg-gradient-to-r from-white dark:from-zinc-950 via-white/95 dark:via-zinc-950/95 to-transparent 
+    text-zinc-900 dark:text-white absolute w-full h-full flex items-center p-6 md:p-8;
+  }
+
+  .carousel-item-cus {
+    @apply max-w-[280px] md:max-w-[520px] flex flex-col gap-4;
+  }
+
+  .carousel-item-eps {
+    @apply text-sm md:text-base font-semibold text-zinc-600 dark:text-zinc-400 
+    px-3 py-1 bg-zinc-100 dark:bg-zinc-800 rounded-full inline-block w-fit;
+  }
+
+  .carousel-item-title {
+    @apply text-2xl md:text-5xl font-bold line-clamp-2 
+    bg-gradient-to-br from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-300 
+    bg-clip-text text-transparent;
+  }
+
+  .carousel-item-btn {
+    @apply flex gap-2 justify-center items-center w-fit
+    text-white bg-black dark:bg-white dark:text-black
+    hover:bg-zinc-800 dark:hover:bg-zinc-200
+    font-medium rounded-lg text-sm md:text-base
+    px-6 py-2.5 md:px-8 md:py-3
+    transition-all duration-200 ease-out
+    hover:shadow-lg hover:scale-105
+    focus:ring-2 focus:ring-zinc-500 dark:focus:ring-zinc-400 focus:outline-none;
+  }
+
+  .anime0-item {
+    @apply hover:text-black dark:hover:text-white line-clamp-1 text-sm 
+    transition-colors duration-200 font-medium;
+  }
+
+  /* Modern Anime Card 1 - Grid Style */
+  .anime1-item-img {
+    @apply aspect-square object-cover w-full h-full rounded-xl;
+    transition: transform 0.3s ease-out;
+  }
+  
+  .anime-card:hover .anime1-item-img {
+    transform: scale(1.05);
+  }
+  
+  .anime1-item-img[src="/images/logo.png"] {
+    @apply object-contain bg-zinc-100 dark:bg-zinc-900 p-4;
+  }
+
+  .anime1-item-eps {
+    @apply absolute text-xs font-semibold top-2 left-2
+    px-2.5 py-1 bg-black/80 dark:bg-white/90 
+    text-white dark:text-black backdrop-blur-sm
+    rounded-lg transition-all duration-200;
+  }
+
+  .anime1-item-title {
+    @apply text-center line-clamp-2 text-sm 
+    text-zinc-700 dark:text-zinc-300 
+    font-medium transition-colors duration-200;
+  }
+  
+  .anime-card:hover .anime1-item-title {
+    @apply text-black dark:text-white;
+  }
+
+  /* Modern Anime Card 2 - Detailed Grid */
+  .anime2-item-img {
+    @apply aspect-[3/4] object-cover w-full h-full rounded-xl;
+    transition: transform 0.3s ease-out;
+  }
+  
+  .anime-card:hover .anime2-item-img {
+    transform: scale(1.05);
+  }
+  
+  .anime2-item-img[src="/images/logo.png"] {
+    @apply object-contain bg-zinc-100 dark:bg-zinc-900 p-4;
+  }
+
+  .anime2-item-type {
+    @apply absolute text-xs font-semibold top-2 left-2
+    px-2.5 py-1 bg-black/80 dark:bg-white/90 
+    text-white dark:text-black backdrop-blur-sm
+    rounded-lg;
+  }
+
+  .anime2-item-score {
+    @apply flex gap-1 items-center absolute top-2 right-2
+    text-xs font-semibold px-2.5 py-1
+    bg-black/80 dark:bg-white/90 
+    text-white dark:text-black backdrop-blur-sm
+    rounded-lg;
+  }
+
+  .anime2-item-status {
+    @apply absolute text-center rounded-lg bottom-2 left-2 right-2
+    text-xs font-semibold px-2 py-1.5
+    bg-black/90 dark:bg-white/95 
+    text-white dark:text-black backdrop-blur-sm;
+  }
+
+  .anime2-item-title {
+    @apply text-center line-clamp-2 text-sm 
+    text-zinc-700 dark:text-zinc-300 
+    font-medium transition-colors duration-200;
+  }
+  
+  .anime-card:hover .anime2-item-title {
+    @apply text-black dark:text-white;
+  }
+
+  /* Modern List Style */
+  .anime3-item-img {
+    @apply min-w-[138px] max-w-[138px] lg:min-w-[96px] lg:max-w-[100px] 
+    aspect-[3/4] rounded-xl transition-all duration-300
+    hover:scale-105 hover:shadow-lg;
+  }
+  
+  .anime3-item-img[src="/images/logo.png"] {
+    @apply object-contain bg-zinc-100 dark:bg-zinc-900 p-2;
+  }
+
+  .anime3-item-title {
+    @apply font-semibold line-clamp-2 
+    hover:text-black dark:hover:text-white
+    transition-colors duration-200;
+  }
+
+  .anime3-item-date {
+    @apply text-sm text-zinc-600 dark:text-zinc-400 line-clamp-1;
+  }
+
+  /* Modern Button Styles */
+  .download-url-item {
+    @apply min-w-min flex gap-2 items-center
+    text-white dark:text-black bg-black dark:bg-white
+    hover:bg-zinc-800 dark:hover:bg-zinc-200
+    focus:outline-none focus:ring-2 focus:ring-zinc-500
+    font-medium rounded-lg text-sm px-5 py-2.5
+    transition-all duration-200 hover:scale-[1.02];
+  }
+
+  .genre-item {
+    @apply text-zinc-700 dark:text-zinc-300 
+    hover:text-black hover:dark:text-white 
+    border border-zinc-300 dark:border-zinc-700 
+    hover:border-black dark:hover:border-white
+    hover:bg-zinc-50 dark:hover:bg-zinc-900
+    focus:ring-2 focus:outline-none focus:ring-zinc-400
+    font-medium rounded-lg text-sm px-5 py-2.5
+    transition-all duration-200 hover:scale-[1.02];
+  }
+
+  .pagination-item {
+    @apply text-zinc-700 dark:text-zinc-300 
+    hover:text-white hover:bg-black 
+    dark:hover:text-black dark:hover:bg-white
+    border border-zinc-300 dark:border-zinc-700
+    focus:ring-2 focus:outline-none focus:ring-zinc-400
+    font-medium rounded-lg text-sm px-4 py-2
+    transition-all duration-200;
+  }
+
+  .pagination-item.active {
+    @apply text-white dark:text-black 
+    bg-black dark:bg-white 
+    border-black dark:border-white
+    font-semibold;
+  }
+
+  .navigation-episode-item {
+    @apply flex-1 min-w-0 truncate 
+    text-white dark:text-black 
+    bg-black dark:bg-white
+    hover:bg-zinc-800 dark:hover:bg-zinc-200
+    focus:outline-none focus:ring-2 focus:ring-zinc-500
+    font-medium rounded-lg text-sm px-4 py-2.5
+    transition-all duration-200 hover:scale-[1.02];
+  }
+}
+
+@tailwind utilities;
+
+@layer utilities {
+  .container {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Custom Scrollbar - Vercel Style */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #d4d4d8;
+    border-radius: 4px;
+    transition: background 0.2s;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #a1a1aa;
+  }
+  
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #3f3f46;
+  }
+  
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #52525b;
+  }
+  
+  /* Fade In Animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out;
+  }
+  
+  /* Glass Effect */
+  .glass-effect {
+    @apply backdrop-blur-md bg-white/80 dark:bg-zinc-950/80 
+    border border-zinc-200/50 dark:border-zinc-800/50;
+  }
+  
+  /* Text Gradient */
+  .text-gradient {
+    @apply bg-gradient-to-br from-zinc-900 to-zinc-600 dark:from-white dark:to-zinc-400 
+    bg-clip-text text-transparent;
+  }
+  
+  /* Smooth Shadow */
+  .shadow-smooth {
+    box-shadow: 0 0 0 1px rgba(0,0,0,.03),
+                0 2px 4px rgba(0,0,0,.05),
+                0 12px 24px rgba(0,0,0,.05);
+  }
+  
+  .dark .shadow-smooth {
+    box-shadow: 0 0 0 1px rgba(255,255,255,.03),
+                0 2px 4px rgba(255,255,255,.05),
+                0 12px 24px rgba(255,255,255,.05);
+  }
+  
+  /* Hover Lift */
+  .hover-lift {
+    @apply transition-all duration-300 ease-out;
+  }
+  
+  .hover-lift:hover {
+    @apply -translate-y-1 shadow-lg;
+  }
+}

@@ -1,0 +1,59 @@
+---
+import generateUrlPath from "@utils/generateUrlPath";
+import StarIcon from "./icons/StarIcon.astro";
+
+interface Props {
+  anime: {
+    list: AnimeCard2[];
+    baseUrlPath: string;
+  };
+}
+
+const {
+  anime: { list, baseUrlPath },
+} = Astro.props;
+
+const FALLBACK_IMAGE = "/images/logo.png";
+---
+
+<div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 py-6">
+  {
+    list.map((anime) => (
+      <>
+        <a
+          href={generateUrlPath(
+            baseUrlPath,
+            anime.animeId || anime.batchId || ""
+          )}
+          class="anime-card"
+        >
+          <div class="relative overflow-hidden rounded-xl">
+            <img
+              loading="lazy"
+              class="anime2-item-img"
+              src={anime.poster || FALLBACK_IMAGE}
+              alt={anime.title}
+              onerror={`this.src='${FALLBACK_IMAGE}';this.onerror=null;`}
+            />
+            <span class="anime2-item-type">{anime.type}</span>
+            <span class="anime2-item-score">
+              <StarIcon class="w-3 h-3" />
+              <span>{anime.score}</span>
+            </span>
+            <span class="anime2-item-status">{anime.status}</span>
+          </div>
+          <div class="p-3">
+            <h3 class="anime2-item-title">{anime.title}</h3>
+          </div>
+        </a>
+        <div class="hidden">
+          {anime.genreList.map((genre) => (
+            <a href={generateUrlPath("/genres", genre.genreId)}>
+              {genre.title}
+            </a>
+          ))}
+        </div>
+      </>
+    ))
+  }
+</div>

@@ -1,0 +1,97 @@
+---
+import Layout from "@layouts/Layout.astro";
+import WidgetTitle from "@components/WidgetTitle.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+import Sesepuh from "@components/Sesepuh.astro";
+import Content from "@components/Content.astro";
+import Sidebar from "@components/Sidebar.astro";
+import animeConfig from "@configs/animeConfig";
+import recentService from "@services/recentService";
+import AnimeList1 from "@components/AnimeList1.astro";
+import Pagination from "@components/Pagination.astro";
+import Error from "@components/Error.astro";
+import genreService from "@services/genreService";
+import generateUrlPath from "@utils/generateUrlPath";
+
+const {
+  molidonghub: { siteName },
+} = animeConfig;
+
+const page = Astro.url.searchParams.get("page");
+const recent = await recentService({ page });
+
+const allGenresData = await genreService();
+const sidebarGenreList = allGenresData.ok 
+  ? allGenresData.data.genreList.filter(g => 
+      !/^(\d{4}|spring|summer|fall|winter)/i.test(g.title) &&
+      g.title && g.genreId && 
+      g.title.trim().length > 0 && 
+      g.genreId.trim().length > 0
+    )
+  : [];
+---
+
+{
+  () => {
+    if (recent.ok) {
+      const title = `Episode Terbaru | Latest Episodes - ${siteName}`;
+
+      return (
+        <Layout
+          seo={{
+            title,
+            description: "Episode anime dan donghua terbaru yang baru saja dirilis",
+          }}
+        >
+          <Breadcrumb
+            currentPage={{
+              title: "Episode Terbaru",
+              href: Astro.url.href,
+              action: "replace",
+            }}
+          />
+          <Sesepuh>
+            <Content>
+              <section>
+                <WidgetTitle title="Episode Terbaru" />
+                <AnimeList1
+                  anime={{
+                    list: recent.data.animeList,
+                    baseUrlPath: "/episode",
+                  }}
+                />
+                <Pagination pagination={recent.pagination} />
+              </section>
+            </Content>
+            <Sidebar>
+              <section>
+                <WidgetTitle title="Daftar Genre" href="/genres" />
+                <div class="flex flex-wrap gap-2 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
+                  {sidebarGenreList.map((genre) => (
+                    <a href={generateUrlPath("/genres", genre.genreId)} 
+                       class="text-xs font-medium px-3 py-2 rounded-lg 
+                       bg-zinc-100 dark:bg-zinc-900 
+                       text-zinc-700 dark:text-zinc-300 
+                       hover:bg-black hover:text-white 
+                       dark:hover:bg-white dark:hover:text-black 
+                       border border-zinc-200 dark:border-zinc-800
+                       transition-all duration-200 hover:scale-105">
+                        {genre.title}
+                    </a>
+                  ))}
+                </div>
+              </section>
+            </Sidebar>
+          </Sesepuh>
+        </Layout>
+      );
+    }
+
+    return (
+      <Error
+        statusCode={recent.statusCode}
+        message={recent.message || recent.statusMessage}
+      />
+    );
+  }
+}

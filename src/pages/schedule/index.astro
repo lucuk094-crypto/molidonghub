@@ -1,0 +1,110 @@
+---
+import scheduleService from "@services/scheduleService";
+import animeConfig from "@configs/animeConfig";
+import Layout from "@layouts/Layout.astro";
+import Breadcrumb from "@components/Breadcrumb.astro";
+import Error from "@components/Error.astro";
+import generateUrlPath from "@utils/generateUrlPath";
+
+const config = (animeConfig as any).default || animeConfig;
+const {
+  molidonghub: { siteName },
+} = config;
+
+const scheduleData = await scheduleService();
+const { ok, data, statusCode, message, statusMessage } = scheduleData;
+
+const daysOrder = [
+  "Monday",
+  "Tuesday", 
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday"
+];
+
+const sortedDays = ok 
+  ? daysOrder.map(day => 
+      data.days.find(d => d.day.toLowerCase() === day.toLowerCase())
+    ).filter(Boolean)
+  : [];
+---
+
+{
+  !ok ? (
+    <Error statusCode={statusCode} message={message || statusMessage} />
+  ) : (
+    <Layout
+      seo={{
+        title: `Jadwal Rilis Donghua - ${siteName}`,
+        description: "Jadwal rilis episode donghua terbaru setiap hari",
+      }}
+    >
+      <Breadcrumb />
+      
+      <div class="py-8 space-y-8">
+        <div class="text-center space-y-3">
+          <h1 class="text-4xl md:text-5xl font-bold bg-gradient-to-r from-zinc-900 via-zinc-700 to-zinc-900 dark:from-zinc-100 dark:via-zinc-300 dark:to-zinc-100 bg-clip-text text-transparent">
+            Jadwal Rilis Donghua
+          </h1>
+          <p class="text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto">
+            Pantau jadwal rilis episode terbaru setiap hari
+          </p>
+        </div>
+
+        <div class="space-y-6">
+          {sortedDays.map((dayData) => (
+            <div class="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden transition-all duration-300 hover:shadow-xl">
+              <div class="bg-gradient-to-r from-zinc-50 to-zinc-100 dark:from-zinc-800 dark:to-zinc-900 px-6 py-4 border-b border-zinc-200 dark:border-zinc-700">
+                <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
+                  <span class="w-2 h-2 rounded-full bg-black dark:bg-white animate-pulse"></span>
+                  {dayData.day}
+                </h2>
+              </div>
+              
+              <div class="p-6">
+                {dayData.animeList.length === 0 ? (
+                  <p class="text-center text-zinc-500 dark:text-zinc-400 py-8">
+                    Tidak ada jadwal rilis untuk hari ini
+                  </p>
+                ) : (
+                  <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                    {dayData.animeList.map((anime) => (
+                      <a
+                        href={generateUrlPath("/anime", anime.animeId)}
+                        class="group block"
+                      >
+                        <div class="relative aspect-[2/3] rounded-xl overflow-hidden mb-3 bg-zinc-100 dark:bg-zinc-800 transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl">
+                          <img
+                            src={anime.poster}
+                            alt={anime.title}
+                            class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                            loading="lazy"
+                            onerror="this.src='/images/placeholder-anime.png'"
+                          />
+                          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div class="absolute bottom-0 left-0 right-0 p-3">
+                              {anime.estimation && (
+                                <div class="bg-white/90 dark:bg-black/90 rounded-lg px-2 py-1 text-xs font-medium text-zinc-900 dark:text-white inline-block">
+                                  🕐 {anime.estimation}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <h3 class="font-semibold text-sm text-zinc-900 dark:text-white line-clamp-2 group-hover:text-black dark:group-hover:text-zinc-300 transition-colors duration-200 min-h-[2.5rem]">
+                          {anime.title}
+                        </h3>
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </Layout>
+  )
+}
