@@ -1,53 +1,20 @@
 import moli from "@utils/moli";
 
-// Donghub API Response Structure
-interface DonghubApiDetail {
+interface NewApiDetail {
+  title: string;
+  alter_title: string;
+  poster: string;
+  rating: string;
+  studio: string;
+  released: string;
+  duration: string;
+  episodes_count: string;
+  season: string;
+  type: string;
   status: string;
-  creator: string;
-  source: string;
-  data: {
-    title: string;
-    poster: string;
-    rating: string;
-    synopsis: string;
-    info: {
-      status: string;
-      network: string;
-      studio: string;
-      released: string;
-      country: string;
-      type: string;
-      episodes: string;
-      fansub: string;
-      casts: string;
-      released_on: string;
-      updated_on: string;
-    };
-    genres: Array<{
-      name: string;
-      slug: string;
-      url: string;
-    }>;
-    batch_link: any;
-    episodes: Array<{
-      episode: string;
-      title: string;
-      slug: string;
-      date: string;
-      url: string;
-    }>;
-    recommendations: Array<{
-      title: string;
-      slug: string;
-      poster: string;
-      episode: string;
-      type: string;
-      status: string;
-      sub: string;
-      release_time: string | null;
-      url: string;
-    }>;
-  };
+  genres: { name: string; slug: string; url: string }[];
+  synopsis: string;
+  episodes_list: { episode: string; slug: string; url: string }[];
 }
 
 interface AnimeDetails {
@@ -79,58 +46,58 @@ export default async function animeInfoService(routeParams: {
   const { animeId } = routeParams;
   
   try {
-    const result = await moli<DonghubApiDetail>(`/detail/${animeId}`);
+    const result = await moli<NewApiDetail>(`/detail/${animeId}`);
     
-    if (!result.ok || !result.data?.data) {
-      console.error('[AnimeInfo] Failed to fetch:', animeId);
-      return {
-        ok: false,
-        statusCode: result.statusCode || 500,
-        statusMessage: "Failed to fetch anime",
-        message: "Anime not found",
-        data: {} as AnimeDetails,
-        pagination: null
-      };
+    if (!result.ok || !result.data) {
+      console.error('[AnimeInfo] Failed to fetch:', result);
+      return result;
     }
     
-    const raw = result.data.data;
+    const raw = result.data;
 
     const mappedData: AnimeDetails = {
-        title: raw.title || "Unknown Title",
-        poster: raw.poster || "/images/placeholder-anime.png",
-        score: { 
-          value: raw.rating || raw.info?.status || "N/A", 
-          users: "" 
-        },
-        japanese: raw.title || "Unknown",
-        synonyms: raw.title || "Unknown",
-        english: raw.title || "Unknown",
-        status: raw.info?.status || "Unknown",
-        type: raw.info?.type || "Unknown",
+        title: raw?.title || "Unknown Title",
+        poster: raw?.poster || "/images/placeholder-anime.png",
+        score: { value: raw?.rating || "N/A", users: "" },
+        japanese: raw?.alter_title || raw?.title || "Unknown",
+        synonyms: raw?.alter_title || raw?.title || "Unknown",
+        english: raw?.title || "Unknown",
+        status: raw?.status || "Unknown",
+        type: raw?.type || "Unknown",
         source: "Original",
-        duration: "Unknown",
-        episodes: parseInt(raw.info?.episodes) || null,
-        season: raw.info?.released || "Unknown",
-        studios: raw.info?.studio || "Unknown",
-        producers: raw.info?.network || "Unknown",
-        aired: raw.info?.released || "Unknown",
+        duration: raw?.duration || "Unknown",
+        episodes: parseInt(raw?.episodes_count) || null,
+        season: raw?.season || "Unknown",
+        studios: raw?.studio || "Unknown",
+        producers: "",
+        aired: raw?.released || "Unknown",
         trailer: "",
         batchList: [],
         synopsis: {
-            paragraphs: raw.synopsis ? [raw.synopsis] : ["No synopsis available."],
+            paragraphs: raw?.synopsis ? [raw.synopsis] : ["No synopsis available."],
             connections: []
         },
-        genreList: (raw.genres || []).map(g => ({
-            title: g.name || "Unknown",
-            genreId: g.slug || ""
+        genreList: (raw?.genres || []).map(g => ({
+            title: g?.name || "Unknown",
+            genreId: g?.slug || ""
         })).filter(g => g.genreId),
-        episodeList: (raw.episodes || [])
+        episodeList: (raw?.episodes_list || [])
             .filter(e => e && e.slug)
             .map(e => {
                 try {
-                    // Extract episode number from episode field or title
-                    const match = e.episode?.match(/(\d+(\.\d+)?)/);
-                    const displayTitle = match ? `Ep ${match[1]}` : (e.episode || "Episode");
+                    const match = e.episode?.match(/Episode\s+(\d+(\.\d+)?)/i);
+                    
+                    let displayTitle = e.episode || "Episode"; 
+
+                    if (match) {
+                        displayTitle = `Ep ${match[1]}`;
+                    } else if (e.slug) {
+                        const slugParts = e.slug.split('-');
+                        const numIndex = slugParts.indexOf('episode');
+                        if (numIndex !== -1 && slugParts[numIndex + 1] && /^\d+$/.test(slugParts[numIndex + 1])) {
+                            displayTitle = `Ep ${slugParts[numIndex + 1]}`;
+                        }
+                    }
 
                     return {
                         title: displayTitle, 
@@ -142,17 +109,10 @@ export default async function animeInfoService(routeParams: {
                 }
             })
             .filter((e): e is EpisodeLinkCard => e !== null)
-            .reverse() // Reverse to show latest first
+            .reverse()
     };
 
-    console.log(`[AnimeInfo] ${raw.title}: ${mappedData.episodeList.length} episodes`);
-
-    return { 
-      ...result, 
-      data: mappedData,
-      ok: true,
-      statusCode: 200
-    };
+    return { ...result, data: mappedData };
   } catch (error) {
     console.error('[AnimeInfo] Service error:', error);
     return {
