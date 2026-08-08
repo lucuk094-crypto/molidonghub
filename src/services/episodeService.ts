@@ -1,26 +1,51 @@
 import moli from "@utils/moli";
 
-interface NewApiEpisode {
-  episode: string;
-  streaming: {
-    main_url: { name: string; url: string };
-    servers: { name: string; url: string }[];
-  };
-  download_url: any;
-  donghua_details: {
+// Donghub API Episode Response
+interface DonghubApiEpisode {
+  status: string;
+  creator: string;
+  source: string;
+  data: {
     title: string;
-    slug: string;
-    poster: string;
-    released: string;
-  };
-  navigation: {
-      previous_episode?: { slug: string; episode: string };
-      next_episode?: { slug: string; episode: string };
+    release_date: string;
+    navigation: {
+      prev_slug: string | null;
+      next_slug: string | null;
+      all_slug: string | null; // ⭐ This is the anime ID!
+    };
+    streams: Array<{
+      server: string;
+      url: string;
+    }>;
+    downloads: any[];
+    anime_info: {
+      title: string;
+      slug: string | null;
+      thumbnail: string;
+      rating: string;
+      rating_percentage: string;
+      status: string;
+      network: string;
+      studio: string;
+      released: string;
+      country: string;
+      type: string;
+      episodes: string;
+      fansub: string;
+      genres: Array<{
+        name: string;
+        url: string;
+      }>;
+      synopsis: string;
+    };
+    related_episodes: any[];
+    recommended_series: any[];
   };
 }
 
 export interface animeEpisode {
   title: string;
+  animeTitle: string;
   animeId: string;
   poster: string;
   releasedOn: string;
@@ -46,92 +71,136 @@ export default async function episodeService(routeParams: {
 }) {
   const { episodeId } = routeParams;
   
-  // Extract anime ID from episode ID as fallback
+  // Fallback: Extract anime ID from episode ID
   const extractAnimeId = (epId: string): string => {
-    // Remove "-episode-123" or "-123" suffix
     const parts = epId.split('-episode-');
     if (parts.length > 1) {
       return parts[0];
     }
-    // Fallback: remove last dash and number
     const match = epId.match(/^(.+?)-\d+$/);
     return match ? match[1] : epId;
   };
   
-  const result = await moli<NewApiEpisode>(`/episode/${episodeId}`);
-  
-  if (!result.ok || !result.data) {
-    console.error('[EpisodeService] Failed to fetch:', episodeId);
-    return result;
-  }
-  
-  const raw = result.data;
-  const details = raw.donghua_details || {};
-  
-  // Use API slug if available, otherwise extract from episodeId
-  const animeId = details.slug || extractAnimeId(episodeId);
-  
-  console.log(`[EpisodeService] Episode: ${episodeId}, Anime ID: ${animeId}`);
+  try {
+    const result = await moli<DonghubApiEpisode>(`/episode/${episodeId}`);
+    
+    if (!result.ok || !result.data?.data) {
+      console.error('[EpisodeService] Failed to fetch:', episodeId);
+      return {
+        ok: false,
+        statusCode: result.statusCode || 500,
+        message: "Episode not found",
+        data: {} as animeEpisode,
+        pagination: null
+      };
+    }
+    
+    const raw = result.data.data;
+    
+    // Use navigation.all_slug first, fallback to extraction
+    const animeId = raw.navigation?.all_slug || extractAnimeId(episodeId);
+    
+    console.log(`[EpisodeService] Episode: ${episodeId}`);
+    console.log(`[EpisodeService] Anime ID: ${animeId}`);
+    console.log(`[EpisodeService] Streams: ${raw.streams?.length || 0}`);
 
-  const serverList = (raw.streaming?.servers || []).map(s => ({
-      title: s.name,
-      serverId: s.url 
-  }));
+    // Map servers from streams array
+    const serverList = (raw.streams || []).map((s, index) => ({
+        title: s.server || `Server ${index + 1}`,
+        serverId: s.url 
+    }));
 
-  if (raw.streaming?.main_url) {
-      serverList.unshift({
-          title: raw.streaming.main_url.name,
-          serverId: raw.streaming.main_url.url
-      });
-  }
-
-  const formats: Format[] = [];
-  if (raw.download_url) {
-      for (const [key, val] of Object.entries(raw.download_url)) {
-            const title = key.replace('download_url_', '');
-            const urls = [];
-            if (typeof val === 'object' && val !== null) {
-                 for (const [host, link] of Object.entries(val)) {
-                     urls.push({ title: host, url: link as string });
-                 }
+    // Map download links
+    const formats: Format[] = [];
+    if (raw.downloads && Array.isArray(raw.downloads)) {
+        raw.downloads.forEach((download: any) => {
+            if (download && typeof download === 'object') {
+                formats.push({
+                    title: download.quality || "Download",
+                    qualities: [{
+                        title: download.quality || "Default",
+                        urls: [{
+                            title: download.provider || "Direct",
+                            url: download.url || ""
+                        }]
+                    }]
+                });
             }
-            formats.push({
-                title: title,
-                qualities: [{ title: title, urls: urls }]
-            });
-      }
+        });
+    }
+
+    const mappedData: animeEpisode = {
+        title: raw.title || `Episode ${episodeId}`,
+        animeTitle: raw.anime_info?.title || 'Unknown Anime',
+        animeId: animeId,
+        poster: raw.anime_info?.thumbnail || '/images/placeholder-anime.png',
+        releasedOn: raw.release_date || 'Unknown',
+        defaultStreamingUrl: serverList[0]?.serverId || "",
+        server: {
+            qualities: [
+                {
+                    title: "Servers",
+                    serverList: serverList
+                }
+            ]
+        },
+        hasPrevEpisode: !!raw.navigation?.prev_slug,
+        prevEpisode: raw.navigation?.prev_slug ? {
+            title: "Previous Episode",
+            episodeId: raw.navigation.prev_slug
+        } : null,
+        hasNextEpisode: !!raw.navigation?.next_slug,
+        nextEpisode: raw.navigation?.next_slug ? {
+            title: "Next Episode",
+            episodeId: raw.navigation.next_slug
+        } : null,
+        downloadUrl: { formats },
+        synopsis: { 
+            paragraphs: raw.anime_info?.synopsis ? [raw.anime_info.synopsis] : []
+        },
+        genreList: (raw.anime_info?.genres || []).map(g => ({
+            title: g.name,
+            genreId: g.name.toLowerCase().replace(/\s+/g, '-')
+        })),
+        recommendedEpisodeList: [],
+        movie: { animeList: [] }
+    };
+
+    return { 
+      ...result, 
+      data: mappedData,
+      ok: true,
+      statusCode: 200
+    };
+  } catch (error) {
+    console.error('[EpisodeService] Error:', error);
+    
+    // Fallback for extraction
+    const animeId = extractAnimeId(episodeId);
+    
+    return {
+      ok: false,
+      statusCode: 500,
+      message: `Failed to fetch episode: ${error}`,
+      data: {
+        title: `Episode ${episodeId}`,
+        animeTitle: 'Unknown',
+        animeId: animeId,
+        poster: '/images/placeholder-anime.png',
+        releasedOn: 'Unknown',
+        defaultStreamingUrl: "",
+        server: { qualities: [] },
+        hasPrevEpisode: false,
+        prevEpisode: null,
+        hasNextEpisode: false,
+        nextEpisode: null,
+        downloadUrl: { formats: [] },
+        synopsis: { paragraphs: [] },
+        genreList: [],
+        recommendedEpisodeList: [],
+        movie: { animeList: [] }
+      } as animeEpisode,
+      pagination: null
+    };
   }
-
-  const mappedData: animeEpisode = {
-      title: raw.episode || `Episode ${episodeId}`,
-      animeId: animeId,
-      poster: details.poster || '/images/placeholder-anime.png',
-      releasedOn: details.released || 'Unknown',
-      defaultStreamingUrl: raw.streaming?.main_url?.url || "",
-      server: {
-          qualities: [
-              {
-                  title: "Servers",
-                  serverList: serverList
-              }
-          ]
-      },
-      hasPrevEpisode: !!raw.navigation?.previous_episode,
-      prevEpisode: raw.navigation?.previous_episode ? {
-          title: raw.navigation.previous_episode.episode,
-          episodeId: raw.navigation.previous_episode.slug
-      } : null,
-      hasNextEpisode: !!raw.navigation?.next_episode,
-      nextEpisode: raw.navigation?.next_episode ? {
-          title: raw.navigation.next_episode.episode,
-          episodeId: raw.navigation.next_episode.slug
-      } : null,
-      downloadUrl: { formats },
-      synopsis: { paragraphs: [] },
-      genreList: [],
-      recommendedEpisodeList: [],
-      movie: { animeList: [] }
-  };
-
-  return { ...result, data: mappedData };
 }
