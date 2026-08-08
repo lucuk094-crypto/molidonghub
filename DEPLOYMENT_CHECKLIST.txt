@@ -1,0 +1,197 @@
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║   🚀 DEPLOYMENT CHECKLIST - MoliDongHub Streaming Site      ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+✅ = Completed
+⏳ = In Progress
+❌ = Not Started
+
+════════════════════════════════════════════════════════════════
+
+📦 PART 1: PERSIAPAN
+
+✅ [DONE] Git initialized
+✅ [DONE] .gitignore created
+✅ [DONE] Initial commit
+❌ [TODO] GitHub account ready
+
+════════════════════════════════════════════════════════════════
+
+🐙 PART 2: GITHUB SETUP
+
+❌ [TODO] Create GitHub repo: "donghuaweb" (Main site)
+❌ [TODO] Push main site to GitHub
+❌ [TODO] Create GitHub repo: "anichin-api" 
+❌ [TODO] Push anichin-api to GitHub
+
+Commands to run:
+──────────────────────────────────────────────────────────────
+# Main site
+cd C:\Users\vanx3\Downloads\donghuaweb-main
+git remote add origin https://github.com/YOUR_USERNAME/donghuaweb.git
+git branch -M main
+git push -u origin main
+
+# Anichin API
+cd C:\Users\vanx3\Downloads\donghuaweb-main\anichin-api-main
+git init
+git config user.email "vanxoffice@example.com"
+git config user.name "Van-XOffice"
+git add .
+git commit -m "Initial commit: Anichin API"
+git remote add origin https://github.com/YOUR_USERNAME/anichin-api.git
+git branch -M main
+git push -u origin main
+──────────────────────────────────────────────────────────────
+
+════════════════════════════════════════════════════════════════
+
+🚂 PART 3: DEPLOY ANICHIN API TO RAILWAY
+
+❌ [TODO] Sign up Railway (https://railway.app)
+❌ [TODO] Connect GitHub account
+❌ [TODO] Create new project from GitHub
+❌ [TODO] Select "anichin-api" repository
+❌ [TODO] Wait for deployment (2-3 min)
+❌ [TODO] Generate domain in Settings
+❌ [TODO] Copy Railway URL
+❌ [TODO] Test: https://YOUR-APP.up.railway.app/genres
+
+Your Railway URL will be:
+──────────────────────────────────────────────────────────────
+https://anichin-api-production-XXXX.up.railway.app
+──────────────────────────────────────────────────────────────
+
+════════════════════════════════════════════════════════════════
+
+🔧 PART 4: UPDATE CONFIG
+
+❌ [TODO] Open: src/utils/hybridApi.ts
+❌ [TODO] Update line 18-22 with Railway URL
+❌ [TODO] Save file
+❌ [TODO] Commit and push changes
+
+Commands:
+──────────────────────────────────────────────────────────────
+cd C:\Users\vanx3\Downloads\donghuaweb-main
+git add .
+git commit -m "Update Railway URL"
+git push
+──────────────────────────────────────────────────────────────
+
+════════════════════════════════════════════════════════════════
+
+▲ PART 5: DEPLOY MAIN SITE TO VERCEL
+
+❌ [TODO] Sign up Vercel (https://vercel.com/signup)
+❌ [TODO] Connect GitHub account
+❌ [TODO] Import "donghuaweb" repository
+❌ [TODO] Click "Deploy" (auto-config ✅)
+❌ [TODO] Wait 2-4 minutes
+❌ [TODO] Copy Vercel URL
+❌ [TODO] Test: https://your-project.vercel.app
+
+Your Vercel URL will be:
+──────────────────────────────────────────────────────────────
+https://donghuaweb.vercel.app
+or
+https://donghuaweb-YOUR-USERNAME.vercel.app
+──────────────────────────────────────────────────────────────
+
+════════════════════════════════════════════════════════════════
+
+🧪 PART 6: TESTING
+
+❌ [TODO] Test homepage loads
+❌ [TODO] Test anime detail page
+❌ [TODO] Test episode page
+❌ [TODO] Open browser console (F12)
+❌ [TODO] Verify: "[HybridEpisode] Merged X servers"
+❌ [TODO] Check server dropdown (should have 5-9 servers)
+❌ [TODO] Test switching between servers
+❌ [TODO] Verify all pages work:
+         - /ongoing
+         - /completed
+         - /schedule
+         - /genres
+         - /bookmarks
+         - /disclaimers
+
+════════════════════════════════════════════════════════════════
+
+📊 DEPLOYMENT SUMMARY
+
+After completing all steps, you will have:
+
+✅ Main Website (Vercel)
+   URL: https://your-project.vercel.app
+   Cost: $0/month
+   Features: Full streaming site with all pages
+
+✅ Backup API (Railway)
+   URL: https://your-app.up.railway.app
+   Cost: $0/month
+   Features: Additional servers, fallback system
+
+✅ Hybrid System
+   Total servers: 5-9 per episode
+   Fallback: Automatic
+   Coverage: Better than single API
+
+════════════════════════════════════════════════════════════════
+
+💰 COST BREAKDOWN
+
+Railway Free Tier:
+- 500 hours/month ($5 credit)
+- Enough for 24/7 running (~720 hours) if optimized
+- Reset monthly
+
+Vercel Free Tier:
+- Unlimited projects
+- 100GB bandwidth/month
+- Enough for 10k-50k visitors/month
+
+Total Cost: $0/month ✅
+
+════════════════════════════════════════════════════════════════
+
+📝 IMPORTANT NOTES
+
+1. Keep your GitHub Personal Access Token safe!
+2. Railway URL is your API backup endpoint
+3. Vercel auto-deploys on every git push
+4. Test episode pages after deployment (most important!)
+5. Browser console shows hybrid system logs
+
+════════════════════════════════════════════════════════════════
+
+📞 NEED HELP?
+
+- Full Guide: Read DEPLOY_STEP_BY_STEP.md
+- Technical Details: Read HYBRID_API_DEPLOYMENT.md
+- API Analysis: Read ANICHIN_API_ANALYSIS.md
+- WhatsApp: https://whatsapp.com/channel/0029Vb7PIC9KQuJRWvETIR2y
+
+════════════════════════════════════════════════════════════════
+
+🎉 ONCE COMPLETED, YOU WILL HAVE:
+
+✅ Professional streaming website
+✅ Dual API system (sankavollerei + anichin)
+✅ 5-9 servers per episode
+✅ Automatic fallback
+✅ Bookmark system
+✅ Watch history
+✅ Schedule page
+✅ Dark/Light mode
+✅ Responsive design
+✅ Free hosting
+✅ Auto-deployments
+
+════════════════════════════════════════════════════════════════
+
+Made with ❤️ by Van-XOffice
+Project: MoliDongHub Streaming Site v2.0
