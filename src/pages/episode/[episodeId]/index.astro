@@ -16,7 +16,8 @@ import hybridEpisodeService from "@services/hybridEpisodeService";
 import genreService from "@services/genreService";
 
 // Use hybrid service for better server coverage
-const USE_HYBRID = true;
+// TEMPORARILY DISABLED: Railway API has different structure
+const USE_HYBRID = false;
 
 const config = (animeConfig as any).default || animeConfig;
 const {

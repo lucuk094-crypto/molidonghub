@@ -45,9 +45,33 @@ export default async function episodeService(routeParams: {
   episodeId: string;
 }) {
   const { episodeId } = routeParams;
+  
+  // Extract anime ID from episode ID as fallback
+  const extractAnimeId = (epId: string): string => {
+    // Remove "-episode-123" or "-123" suffix
+    const parts = epId.split('-episode-');
+    if (parts.length > 1) {
+      return parts[0];
+    }
+    // Fallback: remove last dash and number
+    const match = epId.match(/^(.+?)-\d+$/);
+    return match ? match[1] : epId;
+  };
+  
   const result = await moli<NewApiEpisode>(`/episode/${episodeId}`);
+  
+  if (!result.ok || !result.data) {
+    console.error('[EpisodeService] Failed to fetch:', episodeId);
+    return result;
+  }
+  
   const raw = result.data;
   const details = raw.donghua_details || {};
+  
+  // Use API slug if available, otherwise extract from episodeId
+  const animeId = details.slug || extractAnimeId(episodeId);
+  
+  console.log(`[EpisodeService] Episode: ${episodeId}, Anime ID: ${animeId}`);
 
   const serverList = (raw.streaming?.servers || []).map(s => ({
       title: s.name,
@@ -79,10 +103,10 @@ export default async function episodeService(routeParams: {
   }
 
   const mappedData: animeEpisode = {
-      title: raw.episode,
-      animeId: details.slug,
-      poster: details.poster,
-      releasedOn: details.released,
+      title: raw.episode || `Episode ${episodeId}`,
+      animeId: animeId,
+      poster: details.poster || '/images/placeholder-anime.png',
+      releasedOn: details.released || 'Unknown',
       defaultStreamingUrl: raw.streaming?.main_url?.url || "",
       server: {
           qualities: [
