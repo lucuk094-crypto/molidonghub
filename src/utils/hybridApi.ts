@@ -20,7 +20,7 @@ const API_SOURCES: ApiSource[] = [
   },
   {
     name: "anichin",
-    apiUrl: process.env.ANICHIN_API_URL || "https://anichin-api.railway.app", // Update with your Railway URL
+    apiUrl: "https://molidonghub-api-production.up.railway.app",
     baseUrlPath: "",
     priority: 2, // Fallback
   },
