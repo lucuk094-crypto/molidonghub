@@ -1,8 +1,7 @@
 import moli from "@utils/moli";
 
 interface NewApiGenre {
-    creator: string;
-    data: { name: string; slug: string; href: string; anichinUrl: string }[];
+    data: { name: string; slug: string; url: string }[];
 }
 
 interface AllGenres {
@@ -35,8 +34,8 @@ const ALLOWED_GENRES = [
 export default async function genreService() {
   const result = await moli<NewApiGenre>("/genres");
 
-  const genreList: GenreLinkCard[] = ((result.data as any).genres || result.data.data || [])
-    .filter((item: any) => {
+  const genreList: GenreLinkCard[] = (result.data.data || [])
+    .filter((item) => {
       // Basic validation
       if (!item.name || !item.slug || item.slug.trim().length === 0) {
         return false;
@@ -87,7 +86,7 @@ export default async function genreService() {
       
       return true;
     })
-    .map((item: any) => ({
+    .map((item) => ({
       title: item.name.trim(),
       genreId: item.slug.trim()
     }));

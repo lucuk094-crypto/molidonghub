@@ -12,19 +12,14 @@ export default async function ongoingService(queryParam: {
   page?: string | number | null;
 } = {}) {
   const { page } = queryParam;
-  
-  // Railway API uses /anime endpoint with status parameter
-  const result = await moli<any>(`/anime?status=ongoing&page=${page || 1}`);
+  const result = await moli<NewApiOngoing>(`/ongoing/${page || 1}`);
 
-  // Handle both old and new API formats
-  const items = result.data.ongoing_donghua || result.data.result || result.data.data || [];
-
-  const animeList: animeCard2[] = items
-    .filter((item: any) => {
+  const animeList: animeCard2[] = (result.data.ongoing_donghua || [])
+    .filter((item) => {
       // Filter out invalid items
-      return item && item.slug && item.title && (item.poster || item.thumbnail);
+      return item && item.slug && item.title && item.poster;
     })
-    .map((item: any) => {
+    .map((item) => {
       // Extract clean slug - remove episode suffix if exists
       let cleanSlug = item.slug;
       
@@ -36,21 +31,20 @@ export default async function ongoingService(queryParam: {
       }
       
       // Remove any trailing numbers that might be episode numbers
+      // But keep if it's part of anime title (like "86-eighty-six")
       cleanSlug = cleanSlug.replace(/-episode-\d+$/i, '');
       
       return {
         title: item.title || 'Unknown',
-        poster: item.poster || item.thumbnail || '/images/placeholder-anime.png',
+        poster: item.poster || '/images/placeholder-anime.png',
         status: item.status || 'Ongoing',
         type: "anime",
-        score: item.rating || "N/A",
+        score: "N/A",
         animeId: cleanSlug,
         href: `/anime/${cleanSlug}`,
         genreList: []
       };
     });
-
-  console.log(`[OngoingService] Loaded ${animeList.length} ongoing anime`);
 
   return { ...result, data: { animeList } };
 }

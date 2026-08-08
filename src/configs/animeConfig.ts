@@ -23,8 +23,8 @@ const animeConfig: animeConfig = {
   },
 
   molidonghubApi: {
-    apiUrl: "https://molidonghub-api-production.up.railway.app",
-    baseUrlPath: "",
+    apiUrl: "https://www.sankavollerei.com",
+    baseUrlPath: "/anime/donghua",
   },
 };
 

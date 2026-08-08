@@ -1,21 +1,8 @@
 import moli from "@utils/moli";
 
 interface NewApiHome {
-  page: number;
-  results: Array<{
-    section: string;
-    cards: Array<{
-      eps: number | null;
-      headline: string;
-      slug: string;
-      status: string;
-      thumbnail: string;
-      title: string;
-      type: string;
-    }>;
-  }>;
-  source: string;
-  total: number;
+  latest_release: any[];
+  completed_donghua: any[];
 }
 
 interface Home {
@@ -37,36 +24,16 @@ interface Home {
 }
 
 export default async function homeService() {
-  const result = await moli<NewApiHome>("/");
+  const result = await moli<NewApiHome>("/home/1");
   
-  if (!result.ok || !result.data || !result.data.results) {
-    console.error('[HomeService] Failed to fetch home data');
-    return {
-      ...result,
-      data: {
-        recent: { animeList: [] },
-        batch: { batchList: [] },
-        movie: { animeList: [] }
-      }
-    };
-  }
-
-  // Find sections from Railway API
-  const popularSection = result.data.results.find(s => s.section === "terpopuler_hari_ini");
-  const latestSection = result.data.results.find(s => s.section === "rilisan_terbaru");
-  const movieSection = result.data.results.find(s => s.section === "movie");
-
-  // Map latest releases (rilisan_terbaru)
-  const recentList: animeCard1[] = (latestSection?.cards || [])
-    .filter((item) => item && item.slug && item.title && item.thumbnail)
+  const recentList: animeCard1[] = (result.data.latest_release || [])
+    .filter((item) => item && item.slug && item.title && item.poster)
     .map((item) => {
-      // Extract episode number from status "Ep 123Sub"
-      const epsMatch = item.status.match(/Ep\s*(\d+)/i);
-      const eps = epsMatch ? epsMatch[1] : "??";
+      const eps = (item.current_episode || "??").replace(/Ep\s*/i, "").trim();
       
       return {
         title: item.title,
-        poster: item.thumbnail || '/images/placeholder-anime.png',
+        poster: item.poster || '/images/placeholder-anime.png',
         episodes: eps, 
         releasedOn: "Baru",
         animeId: item.slug, 
@@ -74,9 +41,8 @@ export default async function homeService() {
       };
   });
 
-  // Map popular as completed/batch
-  const completedList: animeCard1[] = (popularSection?.cards || [])
-    .filter((item) => item && item.slug && item.title && item.thumbnail)
+  const completedList: animeCard1[] = (result.data.completed_donghua || [])
+    .filter((item) => item && item.slug && item.title && item.poster)
     .map((item) => {
       // Extract clean slug - remove episode suffix if exists
       let cleanSlug = item.slug;
@@ -90,30 +56,18 @@ export default async function homeService() {
       // Remove any trailing episode numbers
       cleanSlug = cleanSlug.replace(/-episode-\d+$/i, '');
       
-      // Check if completed
-      const isCompleted = item.status.toLowerCase().includes('end') || 
-                         item.status.toLowerCase().includes('tamat');
-      
       return {
         title: item.title,
-        poster: item.thumbnail || '/images/placeholder-anime.png',
-        episodes: isCompleted ? "END" : (item.eps?.toString() || "??"),
-        releasedOn: isCompleted ? "Tamat" : "Ongoing",
+        poster: item.poster || '/images/placeholder-anime.png',
+        episodes: "END",
+        releasedOn: "Tamat",
         batchId: cleanSlug, 
         animeId: cleanSlug,
         href: `/anime/${cleanSlug}`
       };
   });
 
-  // Map movies
-  const movieList: animeCard3[] = (movieSection?.cards || [])
-    .filter((item) => item && item.slug && item.title && item.thumbnail)
-    .map((item) => ({
-      title: item.title,
-      poster: item.thumbnail || '/images/placeholder-anime.png',
-      animeId: item.slug,
-      href: `/episode/${item.slug}`
-    }));
+  const movieList: animeCard3[] = []; 
 
   const mappedData: Home = {
       recent: {
@@ -126,8 +80,6 @@ export default async function homeService() {
           animeList: movieList
       }
   };
-
-  console.log(`[HomeService] Recent: ${recentList.length}, Completed: ${completedList.length}, Movies: ${movieList.length}`);
 
   return { ...result, data: mappedData };
 }
