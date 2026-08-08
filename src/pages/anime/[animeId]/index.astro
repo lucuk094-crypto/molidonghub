@@ -26,6 +26,18 @@ const { animeId } = Astro.params;
 const animeInfo = await animeInfoService({ animeId: animeId! });
 const { data, ok, statusCode, message, statusMessage } = animeInfo;
 
+// Debug logging
+if (ok && data) {
+  console.log(`[AnimeDetail] Title: ${data.title}`);
+  console.log(`[AnimeDetail] Episodes count: ${data.episodeList?.length || 0}`);
+  if (data.episodeList && data.episodeList.length > 0) {
+    console.log(`[AnimeDetail] First episode:`, data.episodeList[0]);
+    console.log(`[AnimeDetail] Last episode:`, data.episodeList[data.episodeList.length - 1]);
+  } else {
+    console.log(`[AnimeDetail] ⚠️ No episodes found!`);
+  }
+}
+
 const allGenresData = await genreService();
 // Filter valid genres only
 const sidebarGenreList = allGenresData.ok 
@@ -160,10 +172,15 @@ if (ok && data.genreList && data.genreList.length > 0) {
           )}
 
           <WidgetTitle title="Daftar Episode" />
-          <div class="flex flex-col gap-4 max-h-[500px] overflow-y-auto custom-scrollbar">
-            {data.episodeList && data.episodeList.length > 0 ? (
-              data.episodeList.map((episode) => {
+          {data.episodeList && data.episodeList.length > 0 ? (
+            <div class="flex flex-col gap-2 max-h-[500px] overflow-y-auto custom-scrollbar p-2">
+              {data.episodeList.map((episode, index) => {
                 try {
+                  if (!episode || !episode.episodeId) {
+                    console.error('Invalid episode at index', index, episode);
+                    return null;
+                  }
+                  
                   // Extract episode number from episodeId
                   const episodeParts = episode.episodeId.split('-');
                   const episodeNumber = episodeParts[episodeParts.length - 1];
@@ -172,13 +189,13 @@ if (ok && data.genreList && data.genreList.length > 0) {
                   return (
                     <a 
                       href={generateUrlPath("/episode", episode.episodeId)} 
-                      class="flex gap-4 items-center hover:bg-zinc-300 dark:hover:bg-zinc-700 p-2 rounded-md transition-colors duration-200"
+                      class="flex gap-4 items-center hover:bg-zinc-200 dark:hover:bg-zinc-800 p-3 rounded-lg transition-all duration-200 border border-transparent hover:border-amber-600"
                     >
-                      <div class="text-white py-2 px-4 bg-sky-700 dark:bg-sky-600 rounded-sm min-w-max">
+                      <div class="text-white font-semibold py-2 px-4 bg-amber-600 dark:bg-amber-700 rounded-lg min-w-max shadow-sm">
                         {epsTitle}
                       </div>
-                      <div class="line-clamp-1">
-                        {data.title} {epsTitle}
+                      <div class="line-clamp-1 text-zinc-700 dark:text-zinc-300">
+                        {data.title} - {epsTitle}
                       </div>
                     </a>
                   );
@@ -186,13 +203,14 @@ if (ok && data.genreList && data.genreList.length > 0) {
                   console.error('Error rendering episode:', episode, error);
                   return null;
                 }
-              })
-            ) : (
-              <div class="text-center py-4 text-zinc-500">
-                Tidak ada episode tersedia
-              </div>
-            )}
-          </div>
+              })}
+            </div>
+          ) : (
+            <div class="text-center py-8 text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 rounded-lg">
+              <p class="text-lg">📺 Belum ada episode tersedia</p>
+              <p class="text-sm mt-2">Episode akan muncul setelah dirilis</p>
+            </div>
+          )}
 
           {recommendations.length > 0 && (
             <>

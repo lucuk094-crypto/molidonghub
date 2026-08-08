@@ -73,26 +73,35 @@ export default async function animeInfoService(routeParams: {
           title: g.name,
           genreId: g.slug
       })),
-      episodeList: (raw.episodes_list || []).map(e => {
-          const match = e.episode.match(/Episode\s+(\d+(\.\d+)?)/i);
-          
-          let displayTitle = e.episode; 
+      episodeList: (raw.episodes_list || [])
+          .filter(e => e && e.slug) // Filter out invalid episodes
+          .map(e => {
+              try {
+                  const match = e.episode.match(/Episode\s+(\d+(\.\d+)?)/i);
+                  
+                  let displayTitle = e.episode; 
 
-          if (match) {
-              displayTitle = `Ep ${match[1]}`;
-          } else {
-              const slugParts = e.slug.split('-');
-              const numIndex = slugParts.indexOf('episode');
-              if (numIndex !== -1 && slugParts[numIndex + 1] && /^\d+$/.test(slugParts[numIndex + 1])) {
-                  displayTitle = `Ep ${slugParts[numIndex + 1]}`;
+                  if (match) {
+                      displayTitle = `Ep ${match[1]}`;
+                  } else {
+                      const slugParts = e.slug.split('-');
+                      const numIndex = slugParts.indexOf('episode');
+                      if (numIndex !== -1 && slugParts[numIndex + 1] && /^\d+$/.test(slugParts[numIndex + 1])) {
+                          displayTitle = `Ep ${slugParts[numIndex + 1]}`;
+                      }
+                  }
+
+                  return {
+                      title: displayTitle, 
+                      episodeId: e.slug, 
+                  };
+              } catch (err) {
+                  console.error('Error mapping episode:', e, err);
+                  return null;
               }
-          }
-
-          return {
-              title: displayTitle, 
-              episodeId: e.slug, 
-          };
-      }).reverse() 
+          })
+          .filter((e): e is EpisodeLinkCard => e !== null) // Remove null entries
+          .reverse() 
   };
 
   return { ...result, data: mappedData };
