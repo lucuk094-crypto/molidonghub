@@ -63,6 +63,7 @@ const { anime } = Astro.props;
         id="video-player-iframe"
         src={anime.defaultStreamingUrl}
         allowfullscreen
+        referrerpolicy="origin"
         class="w-full h-full"
       />
     
@@ -95,6 +96,7 @@ const { anime } = Astro.props;
           id="video-player-iframe"
           class="w-full h-full"
           allowfullscreen
+          referrerpolicy="origin"
           src=${src}
         />
       `;

@@ -27,7 +27,8 @@ const seo: SEOProps = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="referrer" content="no-referrer" />
+    <!-- Remove no-referrer to allow video embed from anichin.moe -->
+    <meta name="referrer" content="origin" />
     <link rel="icon" href={favicon} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />

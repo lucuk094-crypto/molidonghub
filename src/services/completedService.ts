@@ -12,14 +12,19 @@ export default async function completedService(queryParam: {
   page?: string | number | null;
 } = {}) {
   const { page } = queryParam;
-  const result = await moli<NewApiCompleted>(`/completed/${page || 1}`);
+  
+  // Railway API uses /anime endpoint with status parameter
+  const result = await moli<any>(`/anime?status=completed&page=${page || 1}`);
 
-  const animeList: animeCard2[] = (result.data.completed_donghua || [])
-    .filter((item) => {
+  // Handle both old and new API formats
+  const items = result.data.completed_donghua || result.data.result || result.data.data || [];
+
+  const animeList: animeCard2[] = items
+    .filter((item: any) => {
       // Filter out invalid items
-      return item && item.slug && item.title && item.poster;
+      return item && item.slug && item.title && (item.poster || item.thumbnail);
     })
-    .map((item) => {
+    .map((item: any) => {
       // Extract clean slug - remove episode suffix if exists
       let cleanSlug = item.slug;
       
@@ -35,15 +40,17 @@ export default async function completedService(queryParam: {
       
       return {
         title: item.title || 'Unknown',
-        poster: item.poster || '/images/placeholder-anime.png',
+        poster: item.poster || item.thumbnail || '/images/placeholder-anime.png',
         status: item.status || 'Completed',
         type: item.type || "anime",
-        score: "N/A",
+        score: item.rating || "N/A",
         animeId: cleanSlug,
         href: `/anime/${cleanSlug}`,
         genreList: []
       };
     });
+
+  console.log(`[CompletedService] Loaded ${animeList.length} completed anime`);
 
   return { ...result, data: { animeList } };
 }
