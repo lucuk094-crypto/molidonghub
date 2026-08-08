@@ -1,0 +1,206 @@
+{
+  "status": "success",
+  "creator": "Sanka Vollerei",
+  "latest_donghua": [
+    {
+      "title": "Perfect World Movie: Nine Tribulations Burn The Heaven",
+      "slug": "perfect-world-movie-nine-tribulations-burn-the-heaven",
+      "poster": "https://anichin.cafe/wp-content/uploads/2026/08/Perfect-World-Movie-Nine-Tribulations-Burn-The-Heaven.webp",
+      "status": "Completed",
+      "type": "Movie",
+      "sub": "Sub",
+      "href": "/donghua/detail/perfect-world-movie-nine-tribulations-burn-the-heaven",
+      "anichinUrl": "https://anichin.cafe/seri/perfect-world-movie-nine-tribulations-burn-the-heaven/"
+    },
+    {
+      "title": "100.000 Years of Refining Qi",
+      "slug": "100-000-years-of-refining-qi",
+      "poster": "https://anichin.cafe/wp-content/uploads/2023/06/100.000-Years-of-Refining-Qi.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/100-000-years-of-refining-qi",
+      "anichinUrl": "https://anichin.cafe/seri/100-000-years-of-refining-qi/"
+    },
+    {
+      "title": "Crowned In A Hundred Days",
+      "slug": "crowned-in-a-hundred-days",
+      "poster": "https://anichin.cafe/wp-content/uploads/2026/07/Crowned-In-A-Hundred-Days.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/crowned-in-a-hundred-days",
+      "anichinUrl": "https://anichin.cafe/seri/crowned-in-a-hundred-days/"
+    },
+    {
+      "title": "A Record of A Mortal’s Journey to Immortality",
+      "slug": "a-record-of-a-mortals-journey-to-immortality",
+      "poster": "https://anichin.cafe/wp-content/uploads/2023/08/A-Record-of-a-Mortals-Journey-to-Immortality.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/a-record-of-a-mortals-journey-to-immortality",
+      "anichinUrl": "https://anichin.cafe/seri/a-record-of-a-mortals-journey-to-immortality/"
+    },
+    {
+      "title": "Tales of Demons and Gods Season 10",
+      "slug": "tales-of-demons-and-gods-season-10",
+      "poster": "https://anichin.cafe/wp-content/uploads/2026/07/Tales-of-Demons-and-Gods-Season-10.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/tales-of-demons-and-gods-season-10",
+      "anichinUrl": "https://anichin.cafe/seri/tales-of-demons-and-gods-season-10/"
+    },
+    {
+      "title": "Lord of the Ancient God Grave",
+      "slug": "lord-of-the-ancient-god-grave",
+      "poster": "https://anichin.cafe/wp-content/uploads/2021/04/Lord-of-the-Ancient-God-Grave-indo.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/lord-of-the-ancient-god-grave",
+      "anichinUrl": "https://anichin.cafe/seri/lord-of-the-ancient-god-grave/"
+    },
+    {
+      "title": "A Good Day to Ascend",
+      "slug": "a-good-day-to-ascend",
+      "poster": "https://anichin.cafe/wp-content/uploads/2026/07/A-Good-Day-to-Ascend.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/a-good-day-to-ascend",
+      "anichinUrl": "https://anichin.cafe/seri/a-good-day-to-ascend/"
+    },
+    {
+      "title": "Soul Land 2: The Unrivaled Tang Sect",
+      "slug": "soul-land-2-the-unrivaled-tang-sect",
+      "poster": "https://anichin.cafe/wp-content/uploads/2023/06/Soul-Land-2-The-Unrivaled-Tang-Sect-1.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/soul-land-2-the-unrivaled-tang-sect",
+      "anichinUrl": "https://anichin.cafe/seri/soul-land-2-the-unrivaled-tang-sect/"
+    },
+    {
+      "title": "Lingwu Continent",
+      "slug": "lingwu-continent",
+      "poster": "https://anichin.cafe/wp-content/uploads/2024/07/Lingwu-Continent.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/lingwu-continent",
+      "anichinUrl": "https://anichin.cafe/seri/lingwu-continent/"
+    },
+    {
+      "title": "Supreme God Emperor",
+      "slug": "supreme-god-emperor",
+      "poster": "https://anichin.cafe/wp-content/uploads/2020/05/Supreme-God-Emperor.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/supreme-god-emperor",
+      "anichinUrl": "https://anichin.cafe/seri/supreme-god-emperor/"
+    },
+    {
+      "title": "Against the Sky Supreme",
+      "slug": "against-the-sky-supreme",
+      "poster": "https://anichin.cafe/wp-content/uploads/2021/07/Against-the-Sky-Supreme.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/against-the-sky-supreme",
+      "anichinUrl": "https://anichin.cafe/seri/against-the-sky-supreme/"
+    },
+    {
+      "title": "Azure Legacy",
+      "slug": "azure-legacy",
+      "poster": "https://anichin.cafe/wp-content/uploads/2023/06/Azure-Legacy-Season-2.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/azure-legacy",
+      "anichinUrl": "https://anichin.cafe/seri/azure-legacy/"
+    },
+    {
+      "title": "The Great Ruler 3D",
+      "slug": "the-great-ruler-3d",
+      "poster": "https://anichin.cafe/wp-content/uploads/2023/07/The-Great-Ruler-3D.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/the-great-ruler-3d",
+      "anichinUrl": "https://anichin.cafe/seri/the-great-ruler-3d/"
+    },
+    {
+      "title": "Slay The Gods Season 2",
+      "slug": "slay-the-gods-season-2",
+      "poster": "https://anichin.cafe/wp-content/uploads/2026/06/Slay-The-Gods-Season-2-1.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/slay-the-gods-season-2",
+      "anichinUrl": "https://anichin.cafe/seri/slay-the-gods-season-2/"
+    },
+    {
+      "title": "Under the Gate",
+      "slug": "under-the-gate",
+      "poster": "https://anichin.cafe/wp-content/uploads/2026/08/Under-the-Gate.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/under-the-gate",
+      "anichinUrl": "https://anichin.cafe/seri/under-the-gate/"
+    },
+    {
+      "title": "Against the Gods",
+      "slug": "against-the-gods",
+      "poster": "https://i2.wp.com/anichin.cafe/wp-content/uploads/2023/09/Against-the-Gods.png?resize=247,350",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/against-the-gods",
+      "anichinUrl": "https://anichin.cafe/seri/against-the-gods/"
+    },
+    {
+      "title": "Oriental Martial Academy",
+      "slug": "oriental-martial-academy",
+      "poster": "https://anichin.cafe/wp-content/uploads/2026/07/Oriental-Master-Academy.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/oriental-martial-academy",
+      "anichinUrl": "https://anichin.cafe/seri/oriental-martial-academy/"
+    },
+    {
+      "title": "Perfect World",
+      "slug": "perfect-world",
+      "poster": "https://anichin.cafe/wp-content/uploads/2021/04/Perfect-World.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/perfect-world",
+      "anichinUrl": "https://anichin.cafe/seri/perfect-world/"
+    },
+    {
+      "title": "My Senior Brother Is Too Steady",
+      "slug": "my-senior-brother-is-too-steady",
+      "poster": "https://anichin.cafe/wp-content/uploads/2023/12/Senior-Brother-2.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/my-senior-brother-is-too-steady",
+      "anichinUrl": "https://anichin.cafe/seri/my-senior-brother-is-too-steady/"
+    },
+    {
+      "title": "The Eternal Supreme: Li Yunxiao",
+      "slug": "the-eternal-supreme-li-yunxiao",
+      "poster": "https://anichin.cafe/wp-content/uploads/2026/07/The-Eternal-Supreme-Li-Yunxiao.webp",
+      "status": "Ongoing",
+      "type": "Donghua",
+      "sub": "Sub",
+      "href": "/donghua/detail/the-eternal-supreme-li-yunxiao",
+      "anichinUrl": "https://anichin.cafe/seri/the-eternal-supreme-li-yunxiao/"
+    }
+  ]
+}

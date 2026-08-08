@@ -1,22 +1,25 @@
 import moli from "@utils/moli";
 
 interface NewApiEpisode {
-  episode: string;
-  streaming: {
-    main_url: { name: string; url: string };
-    servers: { name: string; url: string }[];
+  result: {
+    durasi: string;
+    name: string;
+    root: string; // anime slug for All Eps button!
+    thumbnail: string;
+    tanggal_rilis: string;
+    status: string;
+    studio: string;
+    rating: string;
+    season: string;
+    sinopsis: string;
+    genre: string[];
+    tipe: string;
+    network?: string;
+    negara?: string;
+    players: { name: string; url: string }[];
+    episode: { episode: string; slug: string; name: string; thumbnail: string; date: string }[];
   };
-  download_url: any;
-  donghua_details: {
-    title: string;
-    slug: string;
-    poster: string;
-    released: string;
-  };
-  navigation: {
-      previous_episode?: { slug: string; episode: string };
-      next_episode?: { slug: string; episode: string };
-  };
+  source: string;
 }
 
 export interface animeEpisode {
@@ -46,68 +49,47 @@ export default async function episodeService(routeParams: {
 }) {
   const { episodeId } = routeParams;
   
-  // Extract anime ID from episode ID as fallback
-  const extractAnimeId = (epId: string): string => {
-    // Remove "-episode-123" or "-123" suffix
-    const parts = epId.split('-episode-');
-    if (parts.length > 1) {
-      return parts[0];
-    }
-    // Fallback: remove last dash and number
-    const match = epId.match(/^(.+?)-\d+$/);
-    return match ? match[1] : epId;
-  };
-  
   const result = await moli<NewApiEpisode>(`/episode/${episodeId}`);
   
-  if (!result.ok || !result.data) {
+  if (!result.ok || !result.data || !result.data.result) {
     console.error('[EpisodeService] Failed to fetch:', episodeId);
-    return result;
+    return {
+      ...result,
+      data: {} as animeEpisode
+    };
   }
   
-  const raw = result.data;
-  const details = raw.donghua_details || {};
+  const raw = result.data.result;
   
-  // Use API slug if available, otherwise extract from episodeId
-  const animeId = details.slug || extractAnimeId(episodeId);
+  // Use root field from API as animeId (perfect for All Eps!)
+  const animeId = raw.root || episodeId.split('-episode-')[0];
   
   console.log(`[EpisodeService] Episode: ${episodeId}, Anime ID: ${animeId}`);
+  console.log(`[EpisodeService] API provides ${(raw.players || []).length} servers`);
+  console.log(`[EpisodeService] Episodes list: ${(raw.episode || []).length} episodes`);
 
-  const serverList = (raw.streaming?.servers || []).map(s => ({
+  // Map players to server list
+  const serverList = (raw.players || []).map(s => ({
       title: s.name,
       serverId: s.url 
   }));
 
-  if (raw.streaming?.main_url) {
-      serverList.unshift({
-          title: raw.streaming.main_url.name,
-          serverId: raw.streaming.main_url.url
-      });
-  }
-
-  const formats: Format[] = [];
-  if (raw.download_url) {
-      for (const [key, val] of Object.entries(raw.download_url)) {
-            const title = key.replace('download_url_', '');
-            const urls = [];
-            if (typeof val === 'object' && val !== null) {
-                 for (const [host, link] of Object.entries(val)) {
-                     urls.push({ title: host, url: link as string });
-                 }
-            }
-            formats.push({
-                title: title,
-                qualities: [{ title: title, urls: urls }]
-            });
-      }
-  }
+  // Find current episode index for prev/next navigation
+  const episodes = raw.episode || [];
+  const currentIndex = episodes.findIndex(e => e.slug === episodeId);
+  
+  const hasPrevEpisode = currentIndex > 0 && currentIndex < episodes.length;
+  const hasNextEpisode = currentIndex >= 0 && currentIndex < episodes.length - 1;
+  
+  const prevEpisode = hasPrevEpisode ? episodes[currentIndex - 1] : null;
+  const nextEpisode = hasNextEpisode ? episodes[currentIndex + 1] : null;
 
   const mappedData: animeEpisode = {
-      title: raw.episode || `Episode ${episodeId}`,
+      title: raw.name || `Episode ${episodeId}`,
       animeId: animeId,
-      poster: details.poster || '/images/placeholder-anime.png',
-      releasedOn: details.released || 'Unknown',
-      defaultStreamingUrl: raw.streaming?.main_url?.url || "",
+      poster: raw.thumbnail || '/images/placeholder-anime.png',
+      releasedOn: raw.tanggal_rilis || 'Unknown',
+      defaultStreamingUrl: serverList[0]?.serverId || "",
       server: {
           qualities: [
               {
@@ -116,19 +98,22 @@ export default async function episodeService(routeParams: {
               }
           ]
       },
-      hasPrevEpisode: !!raw.navigation?.previous_episode,
-      prevEpisode: raw.navigation?.previous_episode ? {
-          title: raw.navigation.previous_episode.episode,
-          episodeId: raw.navigation.previous_episode.slug
+      hasPrevEpisode,
+      prevEpisode: prevEpisode ? {
+          title: `Ep ${prevEpisode.episode}`,
+          episodeId: prevEpisode.slug
       } : null,
-      hasNextEpisode: !!raw.navigation?.next_episode,
-      nextEpisode: raw.navigation?.next_episode ? {
-          title: raw.navigation.next_episode.episode,
-          episodeId: raw.navigation.next_episode.slug
+      hasNextEpisode,
+      nextEpisode: nextEpisode ? {
+          title: `Ep ${nextEpisode.episode}`,
+          episodeId: nextEpisode.slug
       } : null,
-      downloadUrl: { formats },
-      synopsis: { paragraphs: [] },
-      genreList: [],
+      downloadUrl: { formats: [] }, // Railway API doesn't provide download links in episode endpoint
+      synopsis: { paragraphs: [raw.sinopsis] },
+      genreList: (raw.genre || []).map(g => ({
+          title: g,
+          genreId: g.toLowerCase().replace(/\s+/g, '-')
+      })),
       recommendedEpisodeList: [],
       movie: { animeList: [] }
   };

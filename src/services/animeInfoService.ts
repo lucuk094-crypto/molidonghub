@@ -1,20 +1,26 @@
 import moli from "@utils/moli";
 
 interface NewApiDetail {
-  title: string;
-  alter_title: string;
-  poster: string;
-  rating: string;
-  studio: string;
-  released: string;
-  duration: string;
-  episodes_count: string;
-  season: string;
-  type: string;
-  status: string;
-  genres: { name: string; slug: string; url: string }[];
-  synopsis: string;
-  episodes_list: { episode: string; slug: string; url: string }[];
+  result: {
+    name: string;
+    thumbnail: string;
+    rating: string;
+    studio: string;
+    network?: string;
+    tanggal_rilis: string;
+    durasi: string;
+    tipe: string;
+    negara?: string;
+    diposting_oleh?: string;
+    ditambahkan?: string;
+    diperbarui_pada?: string;
+    status: string;
+    season: string;
+    genre: string[];
+    sinopsis: { paragraphs: string[]; title: string };
+    episode: { episode: string; slug: string; subtitle: string; thumbnail: string; date: string }[];
+  };
+  source: string;
 }
 
 interface AnimeDetails {
@@ -46,58 +52,57 @@ export default async function animeInfoService(routeParams: {
   const { animeId } = routeParams;
   
   try {
-    const result = await moli<NewApiDetail>(`/detail/${animeId}`);
+    const result = await moli<NewApiDetail>(`/${animeId}`);
     
-    if (!result.ok || !result.data) {
+    if (!result.ok || !result.data || !result.data.result) {
       console.error('[AnimeInfo] Failed to fetch:', result);
-      return result;
+      return {
+        ...result,
+        data: {} as AnimeDetails
+      };
     }
     
-    const raw = result.data;
+    const raw = result.data.result;
+
+    console.log(`[AnimeInfo] Title: ${raw?.name}`);
+    console.log(`[AnimeInfo] Episodes: ${(raw?.episode || []).length}`);
+    console.log(`[AnimeInfo] Status: ${raw?.status}`);
+
+    // Extract episode count from episodes array
+    const episodesCount = (raw?.episode || []).length;
 
     const mappedData: AnimeDetails = {
-        title: raw?.title || "Unknown Title",
-        poster: raw?.poster || "/images/placeholder-anime.png",
+        title: raw?.name || "Unknown Title",
+        poster: raw?.thumbnail || "/images/placeholder-anime.png",
         score: { value: raw?.rating || "N/A", users: "" },
-        japanese: raw?.alter_title || raw?.title || "Unknown",
-        synonyms: raw?.alter_title || raw?.title || "Unknown",
-        english: raw?.title || "Unknown",
+        japanese: raw?.name || "Unknown",
+        synonyms: raw?.name || "Unknown",
+        english: raw?.name || "Unknown",
         status: raw?.status || "Unknown",
-        type: raw?.type || "Unknown",
+        type: raw?.tipe || "Unknown",
         source: "Original",
-        duration: raw?.duration || "Unknown",
-        episodes: parseInt(raw?.episodes_count) || null,
+        duration: raw?.durasi || "Unknown",
+        episodes: episodesCount || null,
         season: raw?.season || "Unknown",
         studios: raw?.studio || "Unknown",
-        producers: "",
-        aired: raw?.released || "Unknown",
+        producers: raw?.network || "",
+        aired: raw?.tanggal_rilis || raw?.ditambahkan || "Unknown",
         trailer: "",
         batchList: [],
         synopsis: {
-            paragraphs: raw?.synopsis ? [raw.synopsis] : ["No synopsis available."],
+            paragraphs: raw?.sinopsis?.paragraphs || ["No synopsis available."],
             connections: []
         },
-        genreList: (raw?.genres || []).map(g => ({
-            title: g?.name || "Unknown",
-            genreId: g?.slug || ""
-        })).filter(g => g.genreId),
-        episodeList: (raw?.episodes_list || [])
+        genreList: (raw?.genre || []).map(g => ({
+            title: g,
+            genreId: g.toLowerCase().replace(/\s+/g, '-')
+        })),
+        episodeList: (raw?.episode || [])
             .filter(e => e && e.slug)
             .map(e => {
                 try {
-                    const match = e.episode?.match(/Episode\s+(\d+(\.\d+)?)/i);
-                    
-                    let displayTitle = e.episode || "Episode"; 
-
-                    if (match) {
-                        displayTitle = `Ep ${match[1]}`;
-                    } else if (e.slug) {
-                        const slugParts = e.slug.split('-');
-                        const numIndex = slugParts.indexOf('episode');
-                        if (numIndex !== -1 && slugParts[numIndex + 1] && /^\d+$/.test(slugParts[numIndex + 1])) {
-                            displayTitle = `Ep ${slugParts[numIndex + 1]}`;
-                        }
-                    }
+                    const epNum = e.episode.trim();
+                    const displayTitle = `Ep ${epNum}`;
 
                     return {
                         title: displayTitle, 
@@ -111,6 +116,8 @@ export default async function animeInfoService(routeParams: {
             .filter((e): e is EpisodeLinkCard => e !== null)
             .reverse()
     };
+
+    console.log(`[AnimeInfo] Mapped ${mappedData.episodeList.length} episodes`);
 
     return { ...result, data: mappedData };
   } catch (error) {
