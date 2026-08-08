@@ -79,6 +79,18 @@ export default async function hybridEpisodeService(routeParams: {
   
   console.log(`[HybridEpisode] Fetching episode: ${episodeId}`);
   
+  // Extract anime ID from episode ID as fallback
+  // Format: "anime-title-episode-123" -> "anime-title"
+  const extractAnimeId = (epId: string): string => {
+    const parts = epId.split('-episode-');
+    if (parts.length > 1) {
+      return parts[0];
+    }
+    // Alternative: last number removal
+    const match = epId.match(/^(.+?)(-\d+)?$/);
+    return match ? match[1] : epId;
+  };
+  
   // Try primary API first (sankavollerei)
   const primaryResult = await moli<NewApiEpisode>(`/episode/${episodeId}`);
   
@@ -86,12 +98,20 @@ export default async function hybridEpisodeService(routeParams: {
   let allDownloadFormats: Format[] = [];
   let episodeData: animeEpisode;
   const sources: string[] = [];
+  let extractedAnimeId = extractAnimeId(episodeId);
 
   // Process primary source (sankavollerei)
   if (primaryResult.ok && primaryResult.data) {
     sources.push("sankavollerei");
     const raw = primaryResult.data;
     const details = raw.donghua_details || {};
+    
+    // Use API-provided slug if available, otherwise use extracted
+    if (details.slug) {
+      extractedAnimeId = details.slug;
+    }
+    
+    console.log(`[HybridEpisode] Anime ID: ${extractedAnimeId}`);
 
     // Collect servers from primary source
     const primaryServers = (raw.streaming?.servers || []).map(s => ({
@@ -129,7 +149,7 @@ export default async function hybridEpisodeService(routeParams: {
     episodeData = {
         title: raw.episode || `Episode ${episodeId}`,
         animeTitle: details.title || 'Unknown Anime',
-        animeId: details.slug || episodeId.split('-episode-')[0],
+        animeId: extractedAnimeId,
         poster: details.poster || '/images/placeholder-anime.png',
         releasedOn: details.released || 'Unknown',
         defaultStreamingUrl: raw.streaming?.main_url?.url || "",
@@ -163,7 +183,7 @@ export default async function hybridEpisodeService(routeParams: {
     episodeData = {
         title: `Episode ${episodeId}`,
         animeTitle: 'Unknown',
-        animeId: episodeId.split('-episode-')[0],
+        animeId: extractedAnimeId,
         poster: '/images/placeholder-anime.png',
         releasedOn: 'Unknown',
         defaultStreamingUrl: "",
@@ -184,15 +204,29 @@ export default async function hybridEpisodeService(routeParams: {
   // Try to get additional servers from Anichin API (fallback/merge)
   try {
     console.log(`[HybridEpisode] Trying anichin API for additional servers...`);
+    console.log(`[HybridEpisode] Endpoint: /episode/${episodeId}`);
     
     const anichinResult = await hybridFetch<AnichinEpisode>(
       `/episode/${episodeId}`,
       { preferredSource: "anichin", retryOnFail: false }
     );
 
+    console.log(`[HybridEpisode] Anichin result:`, {
+      ok: anichinResult.ok,
+      source: anichinResult.source,
+      hasData: !!anichinResult.data
+    });
+
     if (anichinResult.ok && anichinResult.data) {
       sources.push("anichin");
       const anichinData = anichinResult.data;
+      
+      console.log(`[HybridEpisode] Anichin data structure:`, {
+        has_streaming_urls: !!anichinData.streaming_urls,
+        has_video_sources: !!anichinData.video_sources,
+        streaming_servers_count: anichinData.streaming_urls?.servers?.length || 0,
+        video_sources_count: anichinData.video_sources?.length || 0
+      });
       
       // Merge servers from anichin
       const anichinServers: Array<{ title: string; serverId: string }> = [];
